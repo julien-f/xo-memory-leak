@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "app-conf": "^0.5.0",
+    "golike-defer": "^0.4.1",
+    "lodash": "^4.17.11",
+    "promise-toolbox": "^0.10.1",
+    "redis": "^2.8.0",
+    "uuid": "^3.3.2",
+    "xen-api": "^0.18.0"
+  }
+}
