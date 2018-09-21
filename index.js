@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const appConf = require('app-conf')
+const blocked = require('blocked-at')
 const defer = require('golike-defer').default
 const fromCallback = require('promise-toolbox/fromCallback')
 const fromEvent = require('promise-toolbox/fromEvent')
@@ -45,6 +46,10 @@ const createRedisClient = ({ redis: config = {} }) =>
   })
 
 const main = defer(async $defer => {
+  blocked((time, stack) => {
+    console.log(`Blocked for ${time}ms, operation started here:`, stack)
+  })
+
   const config = await appConf.load('xo-server', {
     appDir: `/usr/local/share/node_modules/xo-server/`,
     ignoreUnknownFormats: true,
