@@ -47,7 +47,7 @@ const createRedisClient = ({ redis: config = {} }) =>
 
 const main = defer(async $defer => {
   blocked((time, stack) => {
-    console.log(`Blocked for ${time}ms, operation started here:`, stack)
+    console.log(`Blocked for ${time}ms, operation started here:`, stack.join('\n'))
   })
 
   const config = await appConf.load('xo-server', {
