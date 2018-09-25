@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+global.Promise = require('bluebird')
+
 const appConf = require('app-conf')
 const blocked = require('blocked-at')
 const defer = require('golike-defer').default
