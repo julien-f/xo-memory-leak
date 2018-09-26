@@ -82,6 +82,12 @@ const main = defer(async $defer => {
     indexes: ['host'],
   })
 
+  let size = 0
+  const updateSize = diff => {
+    statsd.count('objects', (size += diff))
+  }
+  updateSize(0)
+
   const xapis = await asyncMap(serversDb.get(), async server => {
     const xapi = new Xapi({
       allowUnauthorized: Boolean(server.allowUnauthorized),
@@ -97,10 +103,10 @@ const main = defer(async $defer => {
 
     const { objects } = xapi
     xapi.on('add', objects => {
-      statsd.increment('objects', size(objects))
+      updateSize(size(objects))
     })
     xapi.on('remove', objects => {
-      statsd.decrement('objects', size(objects))
+      updateSize(-size(objects))
     })
 
     $defer(async () => {
