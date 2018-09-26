@@ -50,7 +50,7 @@ const createRedisClient = ({ redis: config = {} }) =>
   })
 
 const main = defer(async $defer => {
-  const statsd = new Statsd.Client('localhost:8125')
+  const statsd = new Statsd.Client('localhost', 8125)
 
   const config = await appConf.load('xo-server', {
     appDir: `/usr/local/share/node_modules/xo-server/`,
