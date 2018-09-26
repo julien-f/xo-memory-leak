@@ -8,6 +8,8 @@ const defer = require('golike-defer').default
 const fromCallback = require('promise-toolbox/fromCallback')
 const fromEvent = require('promise-toolbox/fromEvent')
 const redis = require('redis')
+const size = require('lodash/size')
+const Statsd = require('node-statsd-client')
 const { Xapi } = require('xen-api')
 
 const asyncMap = require('./async-map')
@@ -48,8 +50,17 @@ const createRedisClient = ({ redis: config = {} }) =>
   })
 
 const main = defer(async $defer => {
+  const statsd = new Statsd.Client('localhost:8125')
+
+  const config = await appConf.load('xo-server', {
+    appDir: `/usr/local/share/node_modules/xo-server/`,
+    ignoreUnknownFormats: true,
+  })
+
   blocked(
     (time, stack) => {
+      statsd.timing('blocked', time)
+
       console.warn(
         `%s - Blocked for %sms, operation started here:`,
         new Date().toISOString(),
@@ -61,11 +72,6 @@ const main = defer(async $defer => {
       threshold: 50,
     }
   )
-
-  const config = await appConf.load('xo-server', {
-    appDir: `/usr/local/share/node_modules/xo-server/`,
-    ignoreUnknownFormats: true,
-  })
 
   const redisClient = createRedisClient(config)
   $defer(fromCallback, cb => redisClient.quit(cb))
@@ -88,6 +94,14 @@ const main = defer(async $defer => {
     })
     await xapi.connect()
     console.log('connected to %s', xapi._humanId)
+
+    const { objects } = xapi
+    xapi.on('add', objects => {
+      statsd.increment('objects', size(objects))
+    })
+    xapi.on('remove', objects => {
+      statsd.decrement('objects', size(objects))
+    })
 
     $defer(async () => {
       await xapi.disconnect()

@@ -8,6 +8,7 @@
     "bluebird": "^3.5.2",
     "golike-defer": "^0.4.1",
     "lodash": "^4.17.11",
+    "node-statsd-client": "^1.0.4",
     "promise-toolbox": "^0.10.1",
     "redis": "^2.8.0",
     "uuid": "^3.3.2",
