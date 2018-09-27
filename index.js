@@ -82,10 +82,12 @@ const main = defer(async $defer => {
     indexes: ['host'],
   })
 
-  let size = 0
-  const updateSize = diff => {
-    statsd.count('objects', (size += diff))
-  }
+  const updateSize = (() => {
+    let size = 0
+    return diff => {
+      statsd.count('objects', (size += diff))
+    }
+  )()
   updateSize(0)
 
   const xapis = await asyncMap(serversDb.get(), async server => {
@@ -102,10 +104,10 @@ const main = defer(async $defer => {
     console.log('connected to %s', xapi._humanId)
 
     const { objects } = xapi
-    xapi.on('add', objects => {
+    objects.on('add', objects => {
       updateSize(size(objects))
     })
-    xapi.on('remove', objects => {
+    objects.on('remove', objects => {
       updateSize(-size(objects))
     })
 
